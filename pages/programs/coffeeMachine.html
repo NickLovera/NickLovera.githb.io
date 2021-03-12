@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+	<iframe width="420" height="315"
+		src="https://youtu.be/D1ARz7-2zOk">
+	</iframe>
+
+	<pre><code>
+----------------coffeeMakerPlan.asp----------------------------
+% Author: Nicholas Lovera
+% Date Created: 8/5/2020
+% Last Modified: 8/6/2020
+
+% The goal will be reached at some time T
+% For each time T that the goal has not been reached
+% Choose 1 action to do at that time T
+% This basic planner is the same as Dr.Wattsons from
+% his yale shootong problem example shown in class
+goal:- goal(T), time(T).
+:- not goal.
+1{occurs(A,T):action(A)}1 :- not goal(T), time(T).
+
+% Only show what actions occur 
+#show occurs/2.
+
+----------------coffeeMakerDomain.asp----------------------------
+% Author: Nicholas Lovera
+% Date Created: 8/5/2020
+% Last Modified: 8/7/2020
+
+% This program is written in answer set programming 
+% Using clingo with this file along side
+% coffeeMakerPlan.asp and any of the examples
+% a plan is created instructing how to make a cup of coffee
+
+
+% Objects
+machine(coffeeMachine).
+drink(coffee).
+filter(coffeeFilter).
+coffeeBeans(weakBeans).
+coffeeBeans(medBeans).
+coffeeBeans(strongBeans).
+water(coldWater).
+water(medWater).
+water(hotWater).
+syrup(frenchV).
+syrup(car).
+syrup(mocha).
+
+% The line below was used as an example for how to add
+% extra syrups, water, or coffeeBeans as shown in the video.
+% The only other changes needed are commented in the example3 file
+% being an extra hold in the goal as well as an extra time step 
+% syrup(example).
+
+% Actions
+action(plugIn(coffeeMachine)) :- machine(coffeeMachine).
+action(grind(B)) :- coffeeBeans(B).
+action(heat(W)) :- water(W).
+action(placing(coffeeFilter)) :- filter(coffeeFilter).
+action(placing(B)) :- coffeeBeans(B).
+action(add(W)) :- water(W).
+action(brew(coffee)) :- drink(coffee).
+action(syrupfy(S)) :- syrup(S).
+
+
+% Fluents
+fluent(on(coffeeMachine)) :- machine(coffeeMachine).
+fluent(ground(B)) :- coffeeBeans(B).
+fluent(heated(W)) :- water(W).
+fluent(placed(coffeeFilter)) :- filter(coffeeFilter).
+fluent(placed(B)) :- coffeeBeans(B).
+fluent(added(W)) :- water(W).
+fluent(brewed(coffee)) :- drink(coffee).
+fluent(flavored(S)) :- syrup(S).
+
+% Dynamic Causal Laws
+
+% Plugging in the coffee machine causes the machine to be on
+holds(on(coffeeMachine),T+1) :- occurs(plugIn(coffeeMachine),T), 
+								machine(coffeeMachine), time(T).
+
+% Grinding the coffee beans causes the beans to be ground
+holds(ground(B),T+1) :- occurs(grind(B),T), coffeeBeans(B), time(T).
+                        
+% Heating the water causes the water to be heated only if the machine is on
+holds(heated(W),T+1) :- occurs(heat(W),T), water(W), time(T),
+                        holds(on(coffeeMachine),T).
+
+% Placing the coffee filter caused the filter to be placed
+holds(placed(coffeeFilter),T+1) :- occurs(placing(coffeeFilter),T), 
+								   filter(coffeeFilter), time(T).
+
+% The coffee beans can be placed only if the beans are ground and the 
+% filter is already placed
+holds(placed(B),T+1) :- time(T),
+						occurs(placing(B),T), 
+						holds(ground(B),T),
+						holds(placed(coffeeFilter),T),
+						filter(coffeeFilter).
+
+% The water can only be added if the beans have been placed 
+% and the water has been heated
+% (Since the beans have to have been placed already
+%  by the rule above the filter is placed, and coffee beans 
+%  are gound and placed)				
+holds(added(W),T+1) :- time(T),
+					   occurs(add(W),T),
+					   holds(placed(B),T),
+					   coffeeBeans(B),
+					   holds(heated(W),T).
+
+% The coffee can only be brewed if the water has been added
+% (Like the rule above since the water has to have been added 
+%  this also means the the water is heated, filter is placed,
+%  and coffee beans are ground and placed					   
+holds(brewed(coffee),T+1) :- time(T),
+							occurs(brew(coffee),T),
+							holds(added(W),T),
+							water(W).
+						 
+% The flavor can only be added after the coffee is brewed						 
+holds(flavored(S),T+1) :- time(T),
+						   occurs(syrupfy(S),T),
+						   holds(brewed(coffee),T),
+						   drink(coffee).
+						 
+
+% Inertia Axioms
+holds(F,T+1) :- fluent(F), time(T), holds(F,T), not -holds(F,T+1).
+-holds(F,T+1) :- fluent(F), time(T), -holds(F,T), not holds(F,T+1).
+
+----------------coffeeMachine.asp----------------------------
+%Objects
+machine(coffeeMachine).
+drink(coffee).
+filter(f1).
+grounds(weakGrounds).
+grounds(medGrounds).
+grounds(strongGrounds).
+water(coldWater).
+water(medWater).
+water(hotWater).
+%flavour(fv).
+%lavour(car).
+%flavour(mocha).
+
+%Actions
+action(plugIn(coffeeMachine)) :- machine(coffeeMachine).
+action(grind(G)) :- grounds(G).
+action(heat(W)) :- water(W).
+action(place(f1)) :- filter(f1).
+action(place(G)) :- grounds(G).
+action(add(W)) :- water(W).
+action(brew(coffee)) :- drink(coffee).
+%action(flavourfy(F)) :- flavour(F).
+
+
+%Fluents
+
+fluent(on(coffeeMachine)) :- machine(coffeeMachine).
+fluent(ground(G)) :- grounds(G).
+fluent(heated(W)) :- water(W).
+fluent(placed(f1)) :- filter(f1).
+fluent(placed(G)) :- grounds(G).
+fluent(added(W)) :- water(W).
+fluent(brewing(coffeeMachine)) :- machine(coffeeMachine).
+
+holds(on(coffeeMachine),T+1) :- occurs(plugIn(coffeeMachine),T), machine(coffeeMachine), time(T).
+
+holds(ground(G),T+1) :- occurs(grind(G),T), grounds(G), time(T).
+
+holds(heated(W),T+1) :- occurs(heat(W),T), water(W), time(T).
+
+holds(placed(f1),T+1) :- occurs(place(f1),T), filter(f1), time(T).
+
+holds(placed(G),T+1) :- grounds(G),
+						time(T),
+						occurs(place(G),T), 
+						holds(ground(G),T),
+						holds(placed(f1),T),
+						filter(f1).
+						
+holds(added(W),T+1) :- water(W),
+					   time(T),
+					   occurs(add(W),T),
+					   holds(placed(G),T),
+					   grounds(G),
+					   holds(heated(W),T).
+					   
+holds(brewed(coffee),T+1) :- drink(coffee),
+						 time(T),
+						 occurs(brew(coffee),T),
+						 holds(added(W),T),
+						 water(W),
+						 holds(on(coffeeMachine),T),
+						 machine(coffeeMachine).
+						 
+
+% Inertia Axioms
+holds(F,T+1) :- fluent(F), time(T), holds(F,T), not -holds(F,T+1).
+-holds(F,T+1) :- fluent(F), time(T), -holds(F,T), not holds(F,T+1).
+%---------------------------------
+-holds(on(coffeeMachine,0)):- machine(coffeeMachine).
+-holds(ground(G),0) :- grounds(G).
+-holds(heated(W),0) :- water(W).
+-holds(placed(f1),0) :- filter(f1).
+-holds(placed(G),0) :- grounds(G).
+-holds(added(W),0) :- water(W).
+-holds(brewed(coffee),0) :- drink(coffee).
+
+goal(T) :- holds(brewed(coffee),T), drink(coffee), time(T).
+
+time(0..7).
+%---------------------------------
+goal:- goal(T), time(T).
+:- not goal.
+1{occurs(A,T):action(A)}1 :- not goal(T), time(T).
+#show occurs/2.
+
+
+----------------coffeeMakerExample1.asp----------------------------
+% Author: Nicholas Lovera
+% Date Created: 8/5/2020
+% Last Modified: 8/6/2020
+
+% This is the intital situiation for any type of coffee the agent wants
+% The machine is off and empty of any ingrediants
+-holds(on(coffeeMachine,0)):- machine(coffeeMachine).
+-holds(ground(B),0) :- coffeeBeans(B).
+-holds(heated(W),0) :- water(W).
+-holds(placed(coffeeFilter),0) :- filter(coffeeFilter).
+-holds(placed(B),0) :- coffeeBeans(B).
+-holds(added(W),0) :- water(W).
+-holds(brewed(coffee),0) :- drink(coffee).
+-holds(flavored(S),0) :- syrup(S).
+
+% This is what determines the type of coffee being made
+% To cahnge the type of coffee switch any or all three
+% of the objects with the other types
+% For this example the agent wants strong strength cold water and caramel
+goal(T) :- holds(flavored(car),T),
+		   holds(ground(strongBeans),T), holds(heated(coldWater),T), 
+		   time(T).
+
+
+time(0..8).
+	</code></pre>
+
+</html>

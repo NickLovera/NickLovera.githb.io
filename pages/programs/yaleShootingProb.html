@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+    <pre><code>
+-------------modyale.asp----------------------------------------------
+% Modified version of Yale Shooting Problem.
+% by Dr. Richard Watson, Texas Tech Computer Science Department
+% Created 8/2/2010.  Last Modified 8/2/2010.
+%
+% Suppose we have the following modified version of the Yale Shooting Problem.
+% There is a turkey.  The turkey can be alive or dead.  The turkey can be
+% wounded or not wounded (we make no requirement that a turkey must be alive to 
+% be wounded).  The turkey can be running or not. The turkey can only be running 
+% if it is alive and not wounded.  The agent has a two guns that can each hold 
+% one bullet at a time.  A gun can be loaded or not loaded.  A gun can be aimed 
+% or not aimed. The agent has three actions: loading a gun, aiming a gun, and 
+% pulling a trigger on a gun.  Loading a gun causes that gun to be loaded. 
+% Loading a gun causes neither gun to be aimed.  A gun cannot be loaded if it is 
+% alread loaded. Aiming a gun causes that gun to be aimed at the turkey.  Pulling 
+% a trigger on gun has a variety of effects depending on the situation.  Pulling 
+% a trigger causes that gun to no longer be aimed.  Pulling the trigger on a gun 
+% causes that gun to be unloaded.  Pulling a trigger on a loaded gun causes the 
+% turkey to be wounded if it was alive and unwounded and either not running or if 
+% the gun was aimed.  Pulling the trigger on a loaded gun causes the turkey to be 
+% dead if it is wounded.
+
+% Objects:
+gun(g1).
+gun(g2).
+
+
+% Actions:
+
+action(load(G)) :- gun(G).
+action(aim(G)):- gun(G).
+action(pull_trigger(G)):- gun(G).
+
+% Fluents:
+
+fluent(alive).
+fluent(wounded).
+fluent(running).
+fluent(loaded(G)) :- gun(G).
+fluent(aimed(G)) :- gun(G).
+
+
+% Laws (in English, then in Action Languages and then each  
+% followed immediately by the translated ASP rules):
+
+% Dynamic Causal Laws
+
+% Loading the gun causes the gun to be loaded.
+% load(G) causes loaded(G).
+holds(loaded(G),T+1) :- occurs(load(G),T), gun(G), time(T).
+
+% Loading a gun causes neither gun to be aimed.
+% load(G1) causes :- aimed(G2).    (note G1 may or may not equal G2)
+-holds(aimed(G2),T+1) :- occurs(load(G1),T), gun(G1), gun(G2), time(T).
+
+% Aiming a gun causes that gun to be aimed at the turkey.
+% aim(G) causes aimed(G).
+holds(aimed(G),T+1) :- occurs(aim(G),T), gun(G), time(T).
+
+% Pulling a trigger causes that gun to no longer be aimed.
+% pull_trigger(G) causes -aimed(G).
+-holds(aimed(G),T+1) :- occurs(pull_trigger(G),T), gun(G), time(T).
+
+% Pulling the trigger on a gun causes that gun to be unloaded.
+% pull_trigger(G) causes -loaded(G).
+-holds(loaded(G),T+1) :- occurs(pull_trigger(G),T), gun(G), time(T).
+
+% Pulling a trigger on a loaded gun causes the turkey to be wounded if it 
+% was alive, unwounded, and not running.
+% pull_trigger(G) causes wounded if loaded(G), alive, -wounded, -running.
+holds(wounded,T+1) :- gun(G),
+                      time(T),
+                      occurs(pull_trigger(G),T),
+                      holds(loaded(G),T),
+                      holds(alive,T),
+                      -holds(wounded,T),
+                      -holds(running,T).
+                      
+% Pulling a trigger on a loaded gun causes the turkey to be wounded if it 
+% was alive, unwounded, and the gun is aimed.  
+% pull_trigger(G) causes wounded if loaded(G), alive, -wounded, aimed(G).
+holds(wounded,T+1) :- gun(G),
+                      time(T),
+                      occurs(pull_trigger(G),T),
+                      holds(loaded(G),T),
+                      holds(alive,T),
+                      -holds(wounded,T),
+                      holds(aimed(G),T).  
+                      
+% Pulling the trigger on a loaded gun causes the turkey to be dead if it 
+% is wounded.
+% pull_trigger(G) causes -alive if loaded(G), wounded.
+-holds(alive,T+1) :- gun(G),
+                     time(T),
+                     occurs(pull_trigger(G),T),
+                     holds(loaded(G),T),
+                     holds(wounded,T).
+  
+% State Constraints:      
+
+% The turkey can only be running if it is alive and not wounded. (2 rules)
+% -running if -alive.
+-holds(running,T) :- -holds(alive,T), time(T).
+% -running if wounded.
+-holds(running,T) :- holds(wounded,T), time(T).
+
+% Impossibility Preconditions
+
+% A gun cannot be loaded if it is already loaded.
+% load(G) impossible if loaded(G).
+:- occurs(load(G),T), holds(loaded(G),T), gun(G), time(T).   
+
+% Inertia Axioms
+holds(F,T+1) :- fluent(F), time(T), holds(F,T), not -holds(F,T+1).
+-holds(F,T+1) :- fluent(F), time(T), -holds(F,T), not holds(F,T+1).
+
+-------------------modyaleprob3.asp----------------------------------------
+% Modified Yale Shooting Problem Problem Instance 3
+% by Dr. Richard Watson, Texas Tech Computer Science Department
+% Created 10/4/2012.  Last Modified 10/4/2012.
+
+% This file is the same problem as instance 1 except 2 extra time 
+% steps are gven to force extra models
+% In this instance the turkey is initially alive, unwounded, and
+% running.  Both guns are neither loaded or aimed.
+% Goal is for the turkey to be dead.
+
+holds(alive,0).
+-holds(wounded,0).
+holds(running,0).
+-holds(loaded(G),0) :- gun(G).
+-holds(aimed(G),0) :- gun(G).
+
+goal(T) :- -holds(alive,T), time(T).
+
+time(0..5).
+    </code></pre>
+<html>
