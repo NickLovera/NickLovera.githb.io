@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+    <pre><code>
+-----------Client.c-------------------------------------------
+#include "source.c"
+#include "letterSource.c"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+
+int main()
+{
+		//printPastWords();
+		
+		printf("How many words are there: ");
+		scanf("%d",&numWords);
+		
+		for(int i = 0; i < numWords ;i++)
+		{
+			printf("Enter your next word ending with : ");
+			scanf("%s",&letters[i].word);
+			getchar();
+		}
+		
+		while(hitpoints != 0)
+		{
+			printf("----------------------------------");
+			printLetters();
+			printNoose();
+			checkLetter();
+			printf("----------------------------------");
+		}
+		
+}
+		
+-----------Source.c-------------------------------------------
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void checkLetter();
+void printLetters();
+void printNoose();
+void printWords();
+void saveGame();
+void printPastWords();
+
+char letter;
+char guess[100];
+char guessed[100];
+int numWords;
+int hitpoints = 6, numCorrect = 0, lost = 0;
+typedef struct answer{
+	char word[100];
+}ANSWER;
+
+ANSWER letters[100], correct[100];
+
+void checkLetter()
+{
+	int guessedCorrect = 0;
+		printf("\n Enter your letter: ");
+		scanf("%c", &letter);
+		getchar();
+		for(int i = 0; i < numWords; i++)
+		{
+			for(int j = 0; j < strlen(letters[i].word); j++)
+			{
+				if(letter == letters[i].word[j])
+				{
+					guessed[numCorrect] = letter;
+					guessedCorrect = 1;
+				}
+			}
+		}
+		if(guessedCorrect)
+		{
+			numCorrect += 1;
+			guessedCorrect = 0;
+		}
+		else 
+			hitpoints -= 1;
+}
+
+void printLetters()
+{
+	int guessedCorrect = 0, allLetters = 1, allCorrect = 1;
+	printf("\n");
+			for(int i = 0; i < numWords; i++)
+			{
+				for(int j = 0; j < strlen(letters[i].word); j++)
+				{
+					for(int k = 0; k < numCorrect; k++)
+					{
+						if(guessed[k] == letters[i].word[j])
+						{
+							printf("%c ",guessed[k]);
+							guessedCorrect = 1;
+							break;
+						}
+					}
+					if(guessedCorrect != 1)
+					{
+						printf("__ ");
+						allCorrect = 0;
+					}
+					else
+						guessedCorrect = 0;
+				}
+				printf("  ");
+			}
+	if(allCorrect == 1)
+	{
+		printNoose();
+		printf("\nYou Won!\n");
+		printf("----------------------------------");
+		saveGame();
+		exit(1);
+	}
+}
+
+void printNoose()
+{
+	FILE *fp;
+	char c;
+	
+	switch(hitpoints)
+	{
+		case 6: fp = fopen("6.txt", "r");
+				break;
+		case 5: fp = fopen("5.txt", "r");
+				break;
+		case 4: fp = fopen("4.txt", "r");
+				break;
+		case 3: fp = fopen("3.txt", "r");
+				break;
+		case 2: fp = fopen("2.txt", "r");
+				break;
+		case 1: fp = fopen("1.txt", "r");
+				lost = 1;
+				break;
+	}
+	
+	if(fp == NULL)
+		exit(1);
+	
+	printf("\n");
+	c = fgetc(fp);
+	while(c != EOF)
+	{
+		printf("%c",c);
+		c = fgetc(fp);
+	}
+	fclose(fp);
+	
+	if(lost == 1)
+	{
+		printf("\nYou Lose!");
+		printf("\nThe word was: ");
+		printWords();
+		saveGame();
+		printPastWords();
+		exit(1);
+	}
+}
+
+void printWords()
+{
+	for(int i = 0; i < numWords; i++)
+	{
+		for(int j = 0; j < strlen(letters[i].word); j++)
+		{
+			printf("%c", letters[i].word[j]);
+		}
+		printf(" ");
+	}
+}
+
+void saveGame()
+{
+	FILE *fp = fopen("info.txt","a");
+	
+	if(fp == NULL)
+		exit(1);
+	
+	fprintf(fp, "%d %d ", numWords, hitpoints);
+	for(int i = 0; i < numWords; i++)
+	{
+		for(int j = 0; j < strlen(letters[i].word); j++)
+		{
+			fprintf(fp, "%c",letters[i].word[j]);
+		}
+		fprintf(fp, " ");
+	}
+	fprintf(fp, "\r\n");
+	fclose(fp);
+}
+
+
+//the first line in file (the first integer doesnt get printed but rest do)
+//find integer values for letters and if read isn't in acceptable range then it is a int so dont print anything
+void printPastWords()
+{
+	FILE *fp = fopen("info.txt","r");
+	char read;
+	int readNum, readHitpoints;
+	
+	
+	if(fp == NULL)
+		exit(1);
+	printf("\n#Words Hitpoints word\n");
+	
+	
+		fscanf(fp,"%d %d",&readNum, &readHitpoints); 
+		for(;;)
+		{
+			read = fgetc(fp);
+			if(read == EOF)
+				break;
+			printf("%c", read);
+		}
+		
+	
+	fclose(fp);
+}
+
+-----------Client.c-------------------------------------------
+    </code></pre>
+
+</html>
