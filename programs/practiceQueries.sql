@@ -1,0 +1,379 @@
+use class2020;
+
+#6.1.1
+#Lists all details from Staff
+SELECT staffNo, fName, lName,
+position, sex, DOB, salary, staff_branchNo
+FROM Staff;
+
+#6.1.2
+#Easier way to get all details from Staff
+SELECT *
+FROM Staff;
+
+#6.2
+#Get only some details from Staff
+SELECT staffNo, fName, lName, salary
+FROM Staff;
+
+#6.3.1
+#View property numbers from Viewing
+SELECT propertyNo
+FROM Viewing;
+
+#6.3.2
+#Get rid of duplicate property numbers from Viewing
+SELECT DISTINCT propertyNo
+FROM Viewing;
+
+#6.4.1
+#Produces a monthly salary for each staff member
+SELECT staffNo, fName, lName, salary/12
+FROM Staff;
+
+#6.4.2
+#Save each staffs monthly salary in a new collumn
+SELECT staffNo, fName, lName, salary/12
+AS monthlySalary
+FROM Staff;
+
+#6.5
+#Get staff info for staff with a salary greater than 10,000
+SELECT staffNo, fName, lName, position, salary
+FROM Staff
+WHERE salary > 10000;
+
+#6.6
+#Get all branch details from London and Glasgow
+SELECT *
+FROM Branch
+WHERE city = ‘London’ OR city = ‘Glasgow’;
+
+#6.7.1
+#Get details of staff with a salary between 20,000 and 30,000
+SELECT staffNo, fName, lName, position, salary
+FROM Staff
+WHERE salary BETWEEN 20000 AND 30000;
+
+#6.7.2
+#Another way to do range in a WHERE statement
+SELECT staffNo, fName, lName, position, salary
+FROM Staff
+WHERE salary>=20000 AND salary <= 30000;
+
+#6.8.1
+#Get details of only managers and supervisors
+SELECT staffNo, fName, lName, position
+FROM Staff
+WHERE position IN (‘Manager’, ‘Supervisor’);
+
+#6.8.2
+#Another way to do set membership in WHERE
+SELECT staffNo, fName, lName, position
+FROM Staff
+WHERE position=‘Manager’ OR
+position=‘Supervisor’;
+
+#6.9
+#Get owners details who have a home in Glasgow
+SELECT ownerNo, fName, lName, address, telNo
+FROM PrivateOwner
+WHERE address LIKE ‘%Glasgow%’;
+
+#6.10
+#Get client and view date of a specific property who didn't leave a comment
+SELECT clientNo, viewDate
+FROM Viewing
+WHERE propertyNo = ‘PG4’ AND
+comment IS NULL;
+
+#6.11
+#Get staff details in descinding order by salary
+SELECT staffNo, fName, lName, salary
+FROM Staff
+ORDER BY salary DESC;
+
+#6.12
+#Odering output first by type in ascending and then rent in descending
+SELECT propertyNo, type, rooms, rent
+FROM PropertyForRent
+ORDER BY type, rent DESC;
+
+#6.13
+#Get total number of propertys with rent above 350
+SELECT COUNT(*) AS myCount
+FROM PropertyForRent
+WHERE rent > 350;
+
+#6.14
+#Get propertys viewed during may without duplicate property numbers
+SELECT COUNT(DISTINCT propertyNo) AS myCount
+FROM Viewing
+WHERE viewDate BETWEEN ‘1-May-13’
+AND ‘31-May-13’;
+
+#6.15
+#Get total number of staff member per postion and their total salary
+SELECT COUNT(staffNo) AS myCount,
+SUM(salary) AS mySum
+FROM Staff
+WHERE position = ‘Manager’;
+
+#6.16
+#Get the min max and average of all staff members salary
+SELECT MIN(salary) AS myMin,
+MAX(salary) AS myMax,
+AVG(salary) AS myAvg
+FROM Staff;
+
+#6.17
+#Get total number of each postion and each total postions salary
+SELECT branchNo,
+COUNT(staffNo) AS myCount,
+SUM(salary) AS mySum
+FROM Staff
+GROUP BY branchNo
+ORDER BY branchNo;
+
+#6.18
+#For bracnhes with more than 1 employee
+#Get total number of staff and their total salary
+SELECT branchNo,
+COUNT(staffNo) AS myCount,
+SUM(salary) AS mySum
+FROM Staff
+GROUP BY branchNo
+HAVING COUNT(staffNo) > 1
+ORDER BY branchNo;
+
+#Sub query in Where clause
+#
+SELECT staffNo, fName, lName, position
+FROM Staff
+WHERE branchNo =
+(SELECT branchNo
+FROM Branch
+WHERE street = ‘163 Main St’);
+
+#Sub query with comparison
+#
+SELECT staffNo, fName, lName, position
+FROM Staff
+WHERE branchNo = ‘B003’;
+
+#6.22
+#Get staff details who have a larger salary than at least 1
+#staff at branch B003
+SELECT staffNo, fName, lName, position, salary
+FROM Staff
+WHERE salary > SOME
+(SELECT salary
+FROM Staff
+WHERE branchNo = ‘B003’);
+
+#6.23
+#Get staff details who have a larger salary than 
+#every staff at branch B003
+SELECT staffNo, fName, lName, position, salary
+FROM Staff
+WHERE salary > ALL
+(SELECT salary
+FROM Staff
+WHERE branchNo = ‘B003’);
+
+#Sub query in WHERE
+#
+SELECT fname, lname, position
+FROM staff
+WHERE staff_branchNo
+IN (SELECT branch_branchNo
+FROM branch
+WHERE city='London');
+
+#Sub query in HAVING
+#
+SELECT staff_branchno,sum(salary)
+FROM staff
+GROUP BY staff_branchno
+HAVING sum(salary)>(SELECT sum(salary)
+FROM staff
+WHERE sex='M' );
+
+#Sub query in SELECT
+#
+SELECT fName, lName, salary - (SELECT
+AVG(salary) FROM Staff) AS salDiffFROMStaff;
+
+#Sub query in FROM
+#
+SELECT position, max(MaxSal) AS MaxTotalSal
+FROM (SELECT city, position, sum(salary) AS MaxSal
+FROM branch JOIN staff ON
+staff_branchno=branch_branchnoGROUP BY city,position)
+GROUP BY position;
+
+#Weird one
+#This fails by the books specification but passes 
+#in mySQL
+SELECT staffNo, fName, IName, position, salary
+FROM Staff
+WHERE (SELECT AVG(salary) FROM Staff) <
+salary;
+
+#Example Scalar Subquery as Operand
+#
+SELECT fName, lName, salary - 2*(SELECT
+AVG(salary) FROM Staff) AS salDiff
+FROM Staff
+WHERE salary>0.5*(SELECT AVG(salary) FROM
+Staff)
+
+#6.21(bad label)
+#
+SELECT propertyNo, street, city, postcode, type, rooms, rent
+FROM PropertyForRent
+WHERE staffNo IN
+(SELECT staffNo
+FROM Staff
+WHERE branchNo =
+(SELECT branchNo
+FROM Branch
+WHERE street = ‘163 Main St’));
+
+#6.24
+#
+SELECT c.clientNo, fName, lName,
+propertyNo, comment
+FROM Client c, Viewing v
+WHERE c.clientNo = v.clientNo;
+
+#Alternate JOIN constructs
+#
+SELECT c.clientNo, fName, lName,
+propertyNo, comment
+FROM Client c JOIN Viewing v ON c.clientNo = v.clientNo;
+
+#6.25
+#
+SELECT s.branchNo, s.staffNo, fName, lName,
+propertyNo
+FROM Staff s, PropertyForRent p
+WHERE s.staffNo = p.staffNo
+ORDER BY s.branchNo, s.staffNo, propertyNo;
+
+#6.26
+#
+SELECT b.branchNo, b.city, s.staffNo, fName, lName,
+propertyNo
+FROM Branch b, Staff s, PropertyForRent p
+WHERE b.branchNo = s.branchNo AND
+s.staffNo = p.staffNo
+ORDER BY b.branchNo, s.staffNo, propertyNo;
+
+#6.28
+#
+SELECT b.*, p.*
+FROM Branch1 b LEFT JOIN
+PropertyForRent1 p ON b.bCity = p.pCity;
+
+#6.29
+#
+SELECT b.*, p.*
+FROM Branch1 b RIGHT JOIN
+PropertyForRent1 p ON b.bCity = p.pCity;
+
+#6.30
+#
+SELECT b.*, p.*
+FROM Branch1 b FULL JOIN
+PropertyForRent1 p ON b.bCity = p.pCity;
+
+#6.32.1
+#
+(SELECT city
+FROM Branch
+WHERE city IS NOT NULL) UNION
+(SELECT city
+FROM PropertyForRent
+WHERE city IS NOT NULL);
+
+#6.32.2
+#
+(SELECT *
+FROM Branch
+WHERE city IS NOT NULL)
+UNION CORRESPONDING BY city
+(SELECT *
+FROM PropertyForRent
+WHERE city IS NOT NULL);
+
+#6.33.1
+#
+(SELECT city FROM Branch)
+INTERSECT
+(SELECT city FROM PropertyForRent);
+
+#6.33.2
+#
+(SELECT * FROM Branch)
+INTERSECT CORRESPONDING BY city
+(SELECT * FROM PropertyForRent);
+
+#6.35
+#
+INSERT INTO Staff
+VALUES (‘SG16’, ‘Alan’, ‘Brown’, ‘Assistant’, ‘M’,
+Date‘1957-05-25’, 8300, ‘B003’);
+
+#6.36.1
+#
+INSERT INTO Staff (staffNo, fName, lName,
+position, salary, branchNo)
+VALUES (‘SG44’, ‘Anne’, ‘Jones’,
+‘Assistant’, 8100, ‘B003’);
+
+#6.36.2
+#
+INSERT INTO Staff
+VALUES (‘SG44’, ‘Anne’, ‘Jones’, ‘Assistant’, NULL,
+NULL, 8100, ‘B003’);
+
+#6.37
+#
+INSERT INTO StaffPropCount
+(SELECT s.staffNo, fName, lName, COUNT(*)
+FROM Staff s, PropertyForRent p
+WHERE s.staffNo = p.staffNo
+GROUP BY s.staffNo, fName, lName)
+UNION
+(SELECT staffNo, fName, lName, 0
+FROM Staff
+WHERE staffNo NOT IN
+(SELECT DISTINCT staffNo
+FROM PropertyForRent));
+
+#6.38
+#
+UPDATE Staff
+SET salary = salary*1.03;
+
+#6.39
+#
+UPDATE Staff
+SET salary = salary*1.05
+WHERE position = 'Manager';
+
+#6.40
+#
+UPDATE Staff
+SET position = ‘Manager’, salary = 18000
+WHERE staffNo = ‘SG14’;
+
+#6.41
+#
+DELETE FROM Viewing
+WHERE propertyNo = ‘PG4’;
+
+#6.42
+#
+DELETE FROM Viewing;
