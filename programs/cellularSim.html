@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+    <pre><code>
+#Program: Cellular Simulation
+#Purpose: Final Project CS 3361 (Concepts of Programming Languages)
+#Author: Nicholas Lovera
+#Date Created: 11/22/20
+#Last Modified: 12/3/2020
+
+import argparse
+from multiprocessing import Pool
+#Values for alive and dead cells
+ALIVE = 1
+DEAD = 0
+
+def main():
+    inputFile =''
+    outputFile = ''
+    threads = 1
+
+    print("Final :: R11454400")
+
+    #Set Up Arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--input" ,help="Input File")
+    parser.add_argument("-o", "--output",help="Output File")
+    parser.add_argument("-t", "--threads",help="Number of Threads",type=int)
+    args = parser.parse_args()
+
+    #Arguments tasks
+    if args.input:
+        inputFile = args.input
+    if args.output:
+        outputFile = args.output
+    if args.threads:
+        threads = args.threads
+    #Put time step 0 into 2d list removing newline
+    #Format [[...0...][0..0..0]]
+    #Each individual list is a row
+    lines = openConvert(inputFile)
+
+    
+    #Determine split of rows to threads
+    processPool = Pool(processes=threads)
+    poolData = []
+
+
+    #Determine alive or dead
+    step = 0
+    while step != 100:
+        for rowNum in range(len(lines)):
+            matrixData = [lines,rowNum]
+            poolData.append(matrixData)
+        finalData = processPool.map(cellCare,poolData)
+        poolData = []
+        lines=[]
+        for j in range(len(finalData)):
+            lines.append(finalData[j][0])
+        step += 1
+
+    #Don't need it anymore
+    del(poolData)
+    
+    #Covert 1's and 0's back to O and . and write to file
+    finalConvert(outputFile,lines)
+
+def cellCare(matrixData):
+    #if alive has EXACT 2 3 4 living friends it stays alive
+    #if dead has even # alive more than 0 friends it becomes alive
+    #everythin else becomes dead or stays dead
+
+    #The full matrix
+    lines = matrixData[0]
+    #The row number the process will be working on
+    rowNum = matrixData[1]
+    #Don't need it anymore
+    del(matrixData)
+    #Number of collumns
+    M = len(lines[0])
+    #Number of rows
+    N = len(lines)
+    #These are used for tracking what the cells are in the next step
+    nextlines = []
+    nextrow = []
+    #Determine if the cell should be alive or dead
+    for j in range(M):
+        friends = (lines[rowNum][(j-1)%M] + lines[rowNum][(j+1)%M] +
+                    lines[(rowNum-1)%(N)][j] + lines[(rowNum+1)%(N)][j] +
+                    lines[(rowNum-1)%(N)][(j-1)%M] + lines[(rowNum-1)%(N)][(j+1)%M] +
+                    lines[(rowNum+1)%(N)][(j-1)%M] + lines[(rowNum+1)%(N)][(j+1)%M]) 
+        #Apply Dead or Alive rules for next step
+        if lines[rowNum][j] == ALIVE:
+            if (friends > 1) and (friends < 5):
+                nextrow.append(ALIVE)
+            else:
+                nextrow.append(DEAD)
+        else:
+            if (friends != 0) and (friends%2 == 0):
+                nextrow.append(ALIVE)
+            else:
+                nextrow.append(DEAD)
+    #This is the list of the row for the next step
+    nextlines.append(nextrow)  
+
+    return(nextlines)
+            
+#Open input file and convert . and O to 0 and 1
+def openConvert(inputFile):
+    #Open and read in file
+    with open(inputFile,"r") as f:
+        step0 = f.readlines()
+
+    N = len(step0)
+    M = len(step0[0])-1
+    #Create new list of ints that represents step 0
+    lines = []
+    for i in range(N):
+        row = []
+        for j in range(M):
+            if step0[i][j] == '.':
+                row.append(DEAD)
+            else:
+                row.append(ALIVE)
+        lines.append(row)
+    return(lines)
+
+#Take the final simulation and convert 0 and 1 to . and O
+def finalConvert(outputFile,step100):
+    N = len(step100)
+    M = len(step100[0])
+    finallines = []
+    for i in range(N):
+        finalrow = []
+        for j in range(M):
+            if step100[i][j] == DEAD:
+                finalrow.append('.')
+            else:
+                finalrow.append('O')
+        finallines.append(finalrow)
+
+    #Write final output
+    with open(outputFile, 'w') as file:
+        file.writelines(''.join(str(j) for j in i) + '\n' for i in finallines)
+
+
+if __name__ =='__main__':
+    main()
+    </code></pre>
+<html>
