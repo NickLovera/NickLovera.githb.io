@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 	<h1>Coffee Machine</h1>
+	<li><p>coffeeMakerPlan.asp</p></li>
 	<pre><code>
-----------------coffeeMakerPlan.asp----------------------------
 % Author: Nicholas Lovera
 % Date Created: 8/5/2020
 % Last Modified: 8/6/2020
@@ -19,7 +19,9 @@ goal:- goal(T), time(T).
 % Only show what actions occur 
 #show occurs/2.
 
-----------------coffeeMakerDomain.asp----------------------------
+</code></pre>
+<li><p>coffeeMakerDomain.asp</p></li>
+<pre><code>
 % Author: Nicholas Lovera
 % Date Created: 8/5/2020
 % Last Modified: 8/7/2020
@@ -127,7 +129,9 @@ holds(flavored(S),T+1) :- time(T),
 holds(F,T+1) :- fluent(F), time(T), holds(F,T), not -holds(F,T+1).
 -holds(F,T+1) :- fluent(F), time(T), -holds(F,T), not holds(F,T+1).
 
-----------------coffeeMachine.asp----------------------------
+</code></pre>
+<li><p>coffeeMaching.asp</p></li>
+<pre><code>
 %Objects
 machine(coffeeMachine).
 drink(coffee).
@@ -215,8 +219,9 @@ goal:- goal(T), time(T).
 1{occurs(A,T):action(A)}1 :- not goal(T), time(T).
 #show occurs/2.
 
-
-----------------coffeeMakerExample1.asp----------------------------
+</code></pre>
+<li><p>coffeeMakerExample1.asp</p></li>
+<pre><code>
 % Author: Nicholas Lovera
 % Date Created: 8/5/2020
 % Last Modified: 8/6/2020
