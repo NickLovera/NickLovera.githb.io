@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <link rel="stylesheet"
+	href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/solarized-dark.min.css">
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+    <pre><code class="java">
+/*Function Description
+
+chocolateFeast has the following parameter(s):
+int n: Bobby's initial amount of money
+int c: the cost of a chocolate bar
+int m: the number of wrappers he can turn in for a free bar
+
+Returns
+int: the number of chocolates Bobby can eat after taking full advantage of the promotion*/
+
+static int chocolateFeast(int n, int c, int m) {
+    int buy = n/c, bars = 0, wrappers = 0;
+
+    while(buy > 0){
+        bars += buy; //Add the bars bought
+        wrappers += buy; //He gets the wrappers from the bars bought;
+        buy = wrappers/m; //He is able to buy bars with the wrappers
+        wrappers = wrappers%m; //Wrappers remaining after buying
+    }
+            
+    return bars;
+}
+	</code></pre>        
+</html>
