@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <link rel="stylesheet"
+	href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/monokai-sublime.min.css">
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+    <h1>Cut the Sticks</h1>
+    <pre><code class="java">
+//You are given a number of sticks of varying lengths. 
+//You will iteratively cut the sticks into smaller sticks, discarding the shortest pieces until there are none left.
+//At each iteration you will determine the length of the shortest stick remaining, cut that length from each of the longer sticks and then discard all the pieces of that shortest length.
+//When all the remaining sticks are the same length, they cannot be shortened so discard them.
+//Given the lengths of n sticks, print the number of sticks that are left before each iteration until there are none left.
+
+static int[] cutTheSticks(int[] arr) {
+    Arrays.sort(arr);
+    List<Integer> holder = new ArrayList<Integer>();       
+    holder.add(arr.length);
+
+    for(int i = 1; i < arr.length; i++){
+        if(arr[i] != arr[i-1]){
+            holder.add(arr.length - i);
+        }
+    }
+    int[] ans = new int[holder.size()];
+    for(int j = 0; j < holder.size(); j++){
+        ans[j] = holder.get(j);
+    } 
+    return ans;
+}
+	</code></pre>  
+</html>
