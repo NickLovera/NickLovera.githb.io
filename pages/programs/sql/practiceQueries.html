@@ -8,45 +8,45 @@
     <pre><code class="sql">
 use class2020;
 
-#6.1.1
-#Lists all details from Staff
+/*6.1.1
+Lists all details from Staff*/
 SELECT staffNo, fName, lName,
 position, sex, DOB, salary, staff_branchNo
 FROM Staff;
 
-#6.1.2
-#Easier way to get all details from Staff
+/*6.1.2
+Easier way to get all details from Staff*/
 SELECT *
 FROM Staff;
 
-#6.2
-#Get only some details from Staff
+/*6.2
+Get only some details from Staff*/
 SELECT staffNo, fName, lName, salary
 FROM Staff;
 
-#6.3.1
-#View property numbers from Viewing
+/*6.3.1
+View property numbers from Viewing*/
 SELECT propertyNo
 FROM Viewing;
 
-#6.3.2
-#Get rid of duplicate property numbers from Viewing
+/*6.3.2
+Get rid of duplicate property numbers from Viewing*/
 SELECT DISTINCT propertyNo
 FROM Viewing;
 
-#6.4.1
-#Produces a monthly salary for each staff member
+/*#6.4.1
+Produces a monthly salary for each staff member*/
 SELECT staffNo, fName, lName, salary/12
 FROM Staff;
 
-#6.4.2
-#Save each staffs monthly salary in a new collumn
+/*6.4.2
+Save each staffs monthly salary in a new collumn*/
 SELECT staffNo, fName, lName, salary/12
 AS monthlySalary
 FROM Staff;
 
-#6.5
-#Get staff info for staff with a salary greater than 10,000
+/*6.5
+Get staff info for staff with a salary greater than 10,000*/
 SELECT staffNo, fName, lName, position, salary
 FROM Staff
 WHERE salary > 10000;
