@@ -57,26 +57,26 @@ SELECT *
 FROM Branch
 WHERE city = ‘London’ OR city = ‘Glasgow’;
 
-#6.7.1
-#Get details of staff with a salary between 20,000 and 30,000
+/*6.7.1
+Get details of staff with a salary between 20,000 and 30,000*/
 SELECT staffNo, fName, lName, position, salary
 FROM Staff
 WHERE salary BETWEEN 20000 AND 30000;
 
-#6.7.2
-#Another way to do range in a WHERE statement
+/*6.7.2
+Another way to do range in a WHERE statement*/
 SELECT staffNo, fName, lName, position, salary
 FROM Staff
 WHERE salary>=20000 AND salary <= 30000;
 
-#6.8.1
-#Get details of only managers and supervisors
+/*6.8.1
+Get details of only managers and supervisors*/
 SELECT staffNo, fName, lName, position
 FROM Staff
 WHERE position IN (‘Manager’, ‘Supervisor’);
 
-#6.8.2
-#Another way to do set membership in WHERE
+/*6.8.2
+Another way to do set membership in WHERE*/
 SELECT staffNo, fName, lName, position
 FROM Staff
 WHERE position=‘Manager’ OR
