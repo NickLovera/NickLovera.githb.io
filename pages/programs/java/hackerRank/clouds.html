@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <link rel="stylesheet"
+	href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/solarized-dark.min.css">
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+    <pre><code class="java">
+static int jumpingOnClouds(int[] c, int k) {
+    int place = 0,energy = 100;
+    while(true){
+        place = (place+k) % c.length;
+        energy--;
+        if(c[place] == 1){
+            energy -= 2;
+        }
+                
+        if(place == 0){
+            break;
+        }
+    }
+    return energy;
+}
+	</code></pre>  
+</html>
