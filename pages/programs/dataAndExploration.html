@@ -1,0 +1,136 @@
+<html>
+    <link rel="stylesheet"
+	href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/atom-one-dark.min.css">
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+    <pre><code class="r">
+#Author: Nicholas Lovera
+#Date: 2/8/2020
+#Version: 5
+#Question 1 and 2 Answered in PDF
+ 
+library(tidyr)
+library(ggplot2)
+library(dplyr)
+library(readr)
+
+#Reading in mpg excel file
+autoMpg <- read.csv('Auto_mpg_raw.csv')
+
+#Removing Car.names
+autoMpg$Car.name <- NULL
+
+#Intresting way i found to print histograms for every 
+#collumn in one function call. It's hard to get all of them 
+#to look good at the same time and easy to read but nice to see
+#at just a glance. pivot_longer()is now recommended in 
+#place of gather() as pivot still has active development 
+#though i couldn't get it to work just right for the histograms.
+#I also create indivual histograms after for question 2
+#https://stackoverflow.com/questions/35372365/how-do-i-generate-a-histogram-for-each-column-of-my-table
+#autoMpg %>% gather() %>% head()
+ggplot(gather(autoMpg), aes(value)) + 
+  geom_histogram(bins = 24) + 
+  facet_wrap(~key, scales = 'free_x')
+
+################################################################
+#Question2
+
+#Original Histograms excluding Car.names
+hist(autoMpg$Cylinders, main = 'Cylinders', 
+     xlab = 'Number of cylinders')
+hist(autoMpg$Displacement, main = 'Displacement',
+     xlab = 'Amount of Displacement',breaks = 4)
+hist(autoMpg$Horsepower, main = 'Horsepower',
+     xlab = 'Amount of Horsepower')
+hist(autoMpg$Weight, main = "Weight",
+     xlab = 'Weight of Car', breaks = 4)
+hist(autoMpg$Acceleration, main = 'Acceleration',
+     xlab = 'Acceleration',breaks = 4)
+hist(autoMpg$Model.year, main = 'Model',
+    xlab = 'Model of Car')
+hist(autoMpg$Origin, main = 'Origin',
+     xlab = 'Origin of Car')
+
+#Changing Missleading Values
+#Horsepower has 5 attributes with 0
+autoMpg$Horsepower <- ifelse(autoMpg$Horsepower == 0,
+         NA, autoMpg$Horsepower)
+
+#Plotting new Histogram with misleading values removed
+hist(autoMpg$Horsepower, main = 'Horsepower',
+     xlab = 'Amount of Horsepower',breaks = 4)
+
+#Saving datafram wihtout missleading values
+write.csv(autoMpg, file = 'Auto_mpg_adjust.csv', row.names = FALSE)
+
+################################################################
+#Question 3
+
+#Reading new csv without missleading values
+autoMpgAj <- read.csv('Auto_mpg_adjust.csv ')
+
+#Creating Z-Values
+autoMpgAj$Cylinders_Z <- scale(x=autoMpgAj$Cylinders)
+autoMpgAj$Displacement_Z <- scale(x=autoMpgAj$Displacement)
+autoMpgAj$Horsepower_z <- scale(x=autoMpgAj$Horsepower)
+autoMpgAj$Weight_Z <- scale(autoMpgAj$Weight)
+autoMpgAj$Acceleration_z <- scale(autoMpgAj$Acceleration)
+autoMpgAj$Model.year_z <- scale(autoMpgAj$Model.year)
+autoMpgAj$Origin_z <- scale(autoMpgAj$Origin)
+
+#Printing Acceleration Outliers
+print('Acceleration Outliers:',(print(autoMpgAj$Acceleration_z[which(autoMpgAj$Acceleration_z  > 3 |
+                                     autoMpgAj$Acceleration_z < -3)])))
+
+
+#Printing Horsepower Outliers
+print('Horsepower Outliers',(print(autoMpgAj$Horsepower_z[which(autoMpgAj$Horsepower_z  > 3 |
+                                     autoMpgAj$Horsepower_z < -3)])))
+
+#########################################################
+#Question4
+
+#Reading in cereals.csv
+cereals <- read.csv("cereals.csv")
+
+#A
+#Bar Grapgh of Manuf with Type Overlay
+ggplot(cereals, aes(Manuf)) + geom_bar(aes(Type)) + coord_flip()
+#Normalized Bar Grapgh of Manuf with Type overlay
+ggplot(cereals, aes(Manuf)) + geom_bar(aes(fill=Type))+ coord_flip()
+
+#B
+#Contingency table of Manuf and Type
+man_type_t1 <- table(cereals$Manuf, cereals$Type)
+man_type_t2 <- addmargins(A=man_type_t1,FUN=list(total=sum),quiet=TRUE)
+man_type_t1.rnd <- round(prop.table(man_type_t1,margin=2)*100,1)
+#showing Table
+man_type_t1.rnd
+
+#C
+#Histogram of Calories with Manuf Overlay
+ggplot(cereals, aes(Calories)) + geom_histogram(aes(fill=Manuf),
+color = 'black', binwidth = 16)
+
+#Normalized Histogram of Clories with Manuf Overlay
+ggplot(cereals, aes(Calories)) +
+  geom_histogram(aes(fill=Manuf), color="black",
+                 position="fill", binwidth= 16)
+
+#D
+#Binning Calories
+cereals$Cals_Binned <- cut(x=cereals$Calories,breaks=c(0,90,110,161), right=FALSE,
+                           labels=c('90 or under','Between 90 and 110','Over 110'))
+#Bar Grapgh of Binned Calories with Mauf Overlay
+ggplot(cereals,aes(Cals_Binned)) + geom_bar(aes(fill=Manuf)) + coord_flip() + xlab('Calories')
+
+
+#Sources refrenced from 
+#R.pdf (DataMining Lecture Slide)
+#DS-3.pdf (DataMining Lecture Slide)
+#DS-4.pdf (DataMining Lecture Slide)
+#https://stackoverflow.com/questions/48771957/r-ignoring-unknown-aesthetics-label
+
+    </code></pre>
+</html>
