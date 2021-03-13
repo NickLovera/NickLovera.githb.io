@@ -18,16 +18,16 @@ static int jumpingOnClouds(int[] c, int k) {
     int place = 0,energy = 100;
     
     while(true){
-        //Make a jump of k spaces if it eceeds c.lenth loop back around
+        //Make a jump of k spaces if it exceeds c.lenth loop back around
         place = (place+k) % c.length;
         energy--;
 
-        //Landed on a cloud so take away 2 more energy
+        //Landed on a thunder cloud so take away 2 more energy
         if(c[place] == 1){
             energy -= 2;
         }
 
-        //We have rached c[0] again end the game        
+        //We have reached c[0] again end the game        
         if(place == 0){
             break;
         }
