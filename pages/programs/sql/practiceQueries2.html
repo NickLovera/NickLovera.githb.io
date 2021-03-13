@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+    <link rel="stylesheet"
+	href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/monokai-sublime.min.css">
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+    <h1>Practice Queries</h1>
+    <pre><code class="sql">
+USE class2020;
+INSERT INTO branch VALUES('B005' , '22 Deer Rd', 'London', 'SW1 4EH' );
+INSERT INTO branch VALUES('B007', '16 Argyll St', 'Aberdeen', 'AB2 35U'),('B003','163 Main St','Glasgow', 'G11 9QX'),
+('B004', '32 Manse Rd', 'Bristol', 'BS99 1NZ'),('B002', '56 Clover Dr', 'London', 'NW10 6EU');
+INSERT INTO staff VALUES('SL21','John','White','Manager','M','1945-10-1',30000,'B005');
+INSERT INTO staff VALUES('SG37', 'Ann', 'Beech', 'Assistant', 'F','1960-11-10',12000,'B005'),
+('SG14','David','Ford','Supervisor','M','1958-03-24','18000','B003'),
+('SA9','Mary','Howe','Assistant','F','1970-02-19','9000','B007'),
+('SG5','Susan','Brand','Manager','F','1940-06-3','24000','B003'),
+('SL41','Julie','Lee','Assistant','F','1965-06-13','9000','B005');
+SELECT * FROM staff;
+
+
+SELECT *
+FROM staff
+WHERE salary IS NOT NULL;
+
+SELECT Staff_branchNo,
+COUNT(staffNo) AS myCount,
+SUM(salary) AS mySum
+FROM Staff
+GROUP BY staff_branchNo
+HAVING COUNT(staffNo) > 1
+ORDER BY Staff_branchNo;
+
+
+SELECT staffNo, fName, lName, position, salary
+FROM Staff
+WHERE (SELECT AVG(salary) FROM staff) < salary;
+
+SELECT * FROM staff
+ORDER BY salary;
+
+
+
+#3.a
+SELECT * FROM staff
+WHERE(fname LIKE '_____');
+
+#3.c
+SELECT *
+FROM branch
+WHERE(postCode LIKE '%X');
+
+#4.b.d
+SELECT *
+from branch
+order by branch_branchNO;
+WHERE city = 'london'
+
+
+#4.f
+select *
+from staff
+order by position , salary DESC;
+
+
+#5.e
+select sum( distinct salary) as mySum, avg(distinct salary) as myAvg
+from staff; 
+
+#5.f
+select count(position) as managerCount
+from staff
+where position = 'manager';
+
+#5.h
+select sum(salary) as salarySum
+from staff
+group by position;
+
+#5.i
+select sum(salary) as salarySum
+from staff
+group by position
+having salarySum > 25000;
+
+#6
+SELECT staff_branchNo, COUNT(staffNo) AS myCount, SUM(salary) AS mySum
+FROM Staff
+#HAVING COUNT(staffNo) > 1
+GROUP BY staff_branchNo
+having count(staffNo) > 1
+order by staff_branchNo;
+
+select distinct fname, position
+FROM  staff s Join branch b On b.city = 'London'
+Order by fname;
+
+#2.2
+select postcode
+From staff s Join branch b On s.position = 'manager' AND s.salary < '25000';
+
+select postcode
+From branch
+Where position = 'manager' AND (select salary from staff) > '25000';
+
+
+
+
+
+
+
+
+    </code></pre>
+</html>
