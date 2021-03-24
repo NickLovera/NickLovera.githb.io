@@ -5,14 +5,14 @@
     $path="C:/foopath/";
     $file="foofile.txt";
 
-    read file contents
+    //read file contents
     $content="
         <h2>$test</h2>
             <code>
                 <pre>".htmlspecialchars(file_get_contents("$test"))."</pre>
             </code>";
 
-    display
+    //display
     echo $content;
 ?>
 </html>
