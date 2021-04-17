@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<link rel="stylesheet"
+href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/monokai-sublime.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<h1>Circular Array Rotation</h1>
+<p>
+    John Watson knows of an operation called a right circular rotation on an array of integers. One rotation operation moves the <br>
+    last array element to the first position and shifts all remaining elements right one. To test Sherlock's abilities, Watson provides <br>
+    Sherlock with an array of integers. Sherlock is to perform the rotation operation a number of times then determine the value of <br>
+    the element at a given position.<br>
+    For each array, perform a number of right circular rotations and return the values of the elements at the given indices.<br><br>
+
+    circularArrayRotation has the following parameter(s)<br>
+    - int a[n]: the array to rotate<br>
+    - int k: the rotation count<br>
+    - int queries[q]: the indices to report<br><br>
+
+    Constraints<br>
+    - 1 &le; n &le; <var>10</var><sup>5</sup><br>
+    - 1 &le; a[i] &le; <var>10</var><sup>5</sup><br>
+    - 1 &le; k &le; <var>10</var><sup>5</sup><br>
+    - 1 &le; q &le; 500<br>
+    - 0 &le; queries[i] < n
+
+
+</p>
+
+<pre><code class="java">
+static int[] circularArrayRotation(int[] a, int k, int[] queries) {
+    int[] result = new int[queries.length];
+    int[] b = new int[a.length];
+    for(int i = 0; i < a.length; i++){
+        b[(i+k)%a.length] = a[i];
+    }
+    for(int i = 0; i < queries.length; i++){
+        returns[i] = b[queries[i]];
+    }
+    return result;
+}
+</code></pre>
+
+</html>
