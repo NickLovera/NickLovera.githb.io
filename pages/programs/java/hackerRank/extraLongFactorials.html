@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+    <link rel="stylesheet"
+    href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/monokai-sublime.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <h1>Extra Long Factorials</h1>
+    <p>Complete the extraLongFactorials function in the editor below. It should print the result and return.
+
+        extraLongFactorials has the following parameter(s):
+        
+        n: an integer
+        1 <= n <= 100</p>
+    <pre><code class="java">
+static void extraLongFactorials(int n) {
+    BigInteger fac;
+    fac = BigInteger.valueOf(n);
+        
+    for(int i = 1; i < n ; i++){
+        fac = fac.multiply(BigInteger.valueOf(n-i));
+    }
+    System.out.println(fac);
+}
+    </code></pre>
+
+</html>
