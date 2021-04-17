@@ -34,7 +34,7 @@ Get rid of duplicate property numbers from Viewing*/
 SELECT DISTINCT propertyNo
 FROM Viewing;
 
-/*#6.4.1
+/*/*6.4.1
 Produces a monthly salary for each staff member*/
 SELECT staffNo, fName, lName, salary/12
 FROM Staff;
@@ -51,8 +51,8 @@ SELECT staffNo, fName, lName, position, salary
 FROM Staff
 WHERE salary > 10000;
 
-#6.6
-#Get all branch details from London and Glasgow
+/*6.6
+/*Get all branch details from London and Glasgow
 SELECT *
 FROM Branch
 WHERE city = ‘London’ OR city = ‘Glasgow’;
@@ -82,60 +82,60 @@ FROM Staff
 WHERE position=‘Manager’ OR
 position=‘Supervisor’;
 
-#6.9
-#Get owners details who have a home in Glasgow
+/*6.9
+Get owners details who have a home in Glasgow*/
 SELECT ownerNo, fName, lName, address, telNo
 FROM PrivateOwner
 WHERE address LIKE ‘%Glasgow%’;
 
-#6.10
-#Get client and view date of a specific property who didn't leave a comment
+/*6.10
+Get client and view date of a specific property who didn't leave a comment*/
 SELECT clientNo, viewDate
 FROM Viewing
 WHERE propertyNo = ‘PG4’ AND
 comment IS NULL;
 
-#6.11
-#Get staff details in descinding order by salary
+/*6.11
+Get staff details in descinding order by salary*/
 SELECT staffNo, fName, lName, salary
 FROM Staff
 ORDER BY salary DESC;
 
-#6.12
-#Odering output first by type in ascending and then rent in descending
+/*6.12
+Odering output first by type in ascending and then rent in descending*/
 SELECT propertyNo, type, rooms, rent
 FROM PropertyForRent
 ORDER BY type, rent DESC;
 
-#6.13
-#Get total number of propertys with rent above 350
+/*6.13
+Get total number of propertys with rent above 350*/
 SELECT COUNT(*) AS myCount
 FROM PropertyForRent
 WHERE rent > 350;
 
-#6.14
-#Get propertys viewed during may without duplicate property numbers
+/*6.14
+Get propertys viewed during may without duplicate property numbers*/
 SELECT COUNT(DISTINCT propertyNo) AS myCount
 FROM Viewing
 WHERE viewDate BETWEEN ‘1-May-13’
 AND ‘31-May-13’;
 
-#6.15
-#Get total number of staff member per postion and their total salary
+/*6.15
+Get total number of staff member per postion and their total salary*/
 SELECT COUNT(staffNo) AS myCount,
 SUM(salary) AS mySum
 FROM Staff
 WHERE position = ‘Manager’;
 
-#6.16
-#Get the min max and average of all staff members salary
+/*6.16
+Get the min max and average of all staff members salary*/
 SELECT MIN(salary) AS myMin,
 MAX(salary) AS myMax,
 AVG(salary) AS myAvg
 FROM Staff;
 
-#6.17
-#Get total number of each postion and each total postions salary
+/*6.17
+Get total number of each postion and each total postions salary*/
 SELECT branchNo,
 COUNT(staffNo) AS myCount,
 SUM(salary) AS mySum
@@ -143,9 +143,9 @@ FROM Staff
 GROUP BY branchNo
 ORDER BY branchNo;
 
-#6.18
-#For bracnhes with more than 1 employee
-#Get total number of staff and their total salary
+/*6.18
+For bracnhes with more than 1 employee
+Get total number of staff and their total salary*/
 SELECT branchNo,
 COUNT(staffNo) AS myCount,
 SUM(salary) AS mySum
@@ -154,8 +154,7 @@ GROUP BY branchNo
 HAVING COUNT(staffNo) > 1
 ORDER BY branchNo;
 
-#Sub query in Where clause
-#
+/*Sub query in Where clause*/
 SELECT staffNo, fName, lName, position
 FROM Staff
 WHERE branchNo =
@@ -163,15 +162,14 @@ WHERE branchNo =
 FROM Branch
 WHERE street = ‘163 Main St’);
 
-#Sub query with comparison
-#
+/*Sub query with comparison*/
 SELECT staffNo, fName, lName, position
 FROM Staff
 WHERE branchNo = ‘B003’;
 
-#6.22
-#Get staff details who have a larger salary than at least 1
-#staff at branch B003
+/*6.22
+Get staff details who have a larger salary than at least 1
+staff at branch B003*/
 SELECT staffNo, fName, lName, position, salary
 FROM Staff
 WHERE salary > SOME
@@ -179,9 +177,9 @@ WHERE salary > SOME
 FROM Staff
 WHERE branchNo = ‘B003’);
 
-#6.23
-#Get staff details who have a larger salary than 
-#every staff at branch B003
+/*6.23
+Get staff details who have a larger salary than 
+every staff at branch B003*/
 SELECT staffNo, fName, lName, position, salary
 FROM Staff
 WHERE salary > ALL
@@ -189,8 +187,7 @@ WHERE salary > ALL
 FROM Staff
 WHERE branchNo = ‘B003’);
 
-#Sub query in WHERE
-#
+/*Sub query in WHERE*/
 SELECT fname, lname, position
 FROM staff
 WHERE staff_branchNo
@@ -198,8 +195,7 @@ IN (SELECT branch_branchNo
 FROM branch
 WHERE city='London');
 
-#Sub query in HAVING
-#
+/*Sub query in HAVING*/
 SELECT staff_branchno,sum(salary)
 FROM staff
 GROUP BY staff_branchno
@@ -207,37 +203,33 @@ HAVING sum(salary)>(SELECT sum(salary)
 FROM staff
 WHERE sex='M' );
 
-#Sub query in SELECT
-#
+/*Sub query in SELECT*/
 SELECT fName, lName, salary - (SELECT
 AVG(salary) FROM Staff) AS salDiffFROMStaff;
 
-#Sub query in FROM
-#
+/*Sub query in FROM*/
 SELECT position, max(MaxSal) AS MaxTotalSal
 FROM (SELECT city, position, sum(salary) AS MaxSal
 FROM branch JOIN staff ON
 staff_branchno=branch_branchnoGROUP BY city,position)
 GROUP BY position;
 
-#Weird one
-#This fails by the books specification but passes 
-#in mySQL
+/*Weird one
+This fails by the books specification but passes 
+in mySQL*/
 SELECT staffNo, fName, IName, position, salary
 FROM Staff
 WHERE (SELECT AVG(salary) FROM Staff) <
 salary;
 
-#Example Scalar Subquery as Operand
-#
+/*Example Scalar Subquery as Operand*/
 SELECT fName, lName, salary - 2*(SELECT
 AVG(salary) FROM Staff) AS salDiff
 FROM Staff
 WHERE salary>0.5*(SELECT AVG(salary) FROM
 Staff)
 
-#6.21(bad label)
-#
+/*6.21(bad label)*/
 SELECT propertyNo, street, city, postcode, type, rooms, rent
 FROM PropertyForRent
 WHERE staffNo IN
@@ -248,29 +240,25 @@ WHERE branchNo =
 FROM Branch
 WHERE street = ‘163 Main St’));
 
-#6.24
-#
+/*6.24*/
 SELECT c.clientNo, fName, lName,
 propertyNo, comment
 FROM Client c, Viewing v
 WHERE c.clientNo = v.clientNo;
 
-#Alternate JOIN constructs
-#
+/*Alternate JOIN constructs*/
 SELECT c.clientNo, fName, lName,
 propertyNo, comment
 FROM Client c JOIN Viewing v ON c.clientNo = v.clientNo;
 
-#6.25
-#
+/*6.25*/
 SELECT s.branchNo, s.staffNo, fName, lName,
 propertyNo
 FROM Staff s, PropertyForRent p
 WHERE s.staffNo = p.staffNo
 ORDER BY s.branchNo, s.staffNo, propertyNo;
 
-#6.26
-#
+/*6.26*/
 SELECT b.branchNo, b.city, s.staffNo, fName, lName,
 propertyNo
 FROM Branch b, Staff s, PropertyForRent p
@@ -278,26 +266,22 @@ WHERE b.branchNo = s.branchNo AND
 s.staffNo = p.staffNo
 ORDER BY b.branchNo, s.staffNo, propertyNo;
 
-#6.28
-#
+/*6.28*/
 SELECT b.*, p.*
 FROM Branch1 b LEFT JOIN
 PropertyForRent1 p ON b.bCity = p.pCity;
 
-#6.29
-#
+/*6.29*/
 SELECT b.*, p.*
 FROM Branch1 b RIGHT JOIN
 PropertyForRent1 p ON b.bCity = p.pCity;
 
-#6.30
-#
+/*6.30*/
 SELECT b.*, p.*
 FROM Branch1 b FULL JOIN
 PropertyForRent1 p ON b.bCity = p.pCity;
 
-#6.32.1
-#
+/*6.32.1*/
 (SELECT city
 FROM Branch
 WHERE city IS NOT NULL) UNION
@@ -305,8 +289,7 @@ WHERE city IS NOT NULL) UNION
 FROM PropertyForRent
 WHERE city IS NOT NULL);
 
-#6.32.2
-#
+/*6.32.2*/
 (SELECT *
 FROM Branch
 WHERE city IS NOT NULL)
@@ -315,39 +298,33 @@ UNION CORRESPONDING BY city
 FROM PropertyForRent
 WHERE city IS NOT NULL);
 
-#6.33.1
-#
+/*6.33.1*/
 (SELECT city FROM Branch)
 INTERSECT
 (SELECT city FROM PropertyForRent);
 
-#6.33.2
-#
+/*6.33.2*/
 (SELECT * FROM Branch)
 INTERSECT CORRESPONDING BY city
 (SELECT * FROM PropertyForRent);
 
-#6.35
-#
+/*6.35*/
 INSERT INTO Staff
 VALUES (‘SG16’, ‘Alan’, ‘Brown’, ‘Assistant’, ‘M’,
 Date‘1957-05-25’, 8300, ‘B003’);
 
-#6.36.1
-#
+/*6.36.1*/
 INSERT INTO Staff (staffNo, fName, lName,
 position, salary, branchNo)
 VALUES (‘SG44’, ‘Anne’, ‘Jones’,
 ‘Assistant’, 8100, ‘B003’);
 
-#6.36.2
-#
+/*6.36.2*/
 INSERT INTO Staff
 VALUES (‘SG44’, ‘Anne’, ‘Jones’, ‘Assistant’, NULL,
 NULL, 8100, ‘B003’);
 
-#6.37
-#
+/*6.37*/
 INSERT INTO StaffPropCount
 (SELECT s.staffNo, fName, lName, COUNT(*)
 FROM Staff s, PropertyForRent p
@@ -360,30 +337,26 @@ WHERE staffNo NOT IN
 (SELECT DISTINCT staffNo
 FROM PropertyForRent));
 
-#6.38
-#
+/*6.38*/
 UPDATE Staff
 SET salary = salary*1.03;
 
-#6.39
-#
+/*6.39*/
 UPDATE Staff
 SET salary = salary*1.05
 WHERE position = 'Manager';
 
-#6.40
-#
+/*6.40
+/*
 UPDATE Staff
 SET position = ‘Manager’, salary = 18000
 WHERE staffNo = ‘SG14’;
 
-#6.41
-#
+/*6.41*/
 DELETE FROM Viewing
 WHERE propertyNo = ‘PG4’;
 
-#6.42
-#
+/*6.42*/
 DELETE FROM Viewing;
     </code></pre>
 </html>
