@@ -52,7 +52,7 @@ FROM Staff
 WHERE salary > 10000;
 
 /*6.6
-/*Get all branch details from London and Glasgow
+Get all branch details from London and Glasgow*/
 SELECT *
 FROM Branch
 WHERE city = ‘London’ OR city = ‘Glasgow’;
@@ -346,8 +346,7 @@ UPDATE Staff
 SET salary = salary*1.05
 WHERE position = 'Manager';
 
-/*6.40
-/*
+/*6.40*/
 UPDATE Staff
 SET position = ‘Manager’, salary = 18000
 WHERE staffNo = ‘SG14’;
