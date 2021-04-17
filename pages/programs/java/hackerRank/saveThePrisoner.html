@@ -10,9 +10,16 @@
     Beginning with the prisoner in that chair, one candy will be handed to each prisoner sequentially around the table until all have been distributed. <br><br>
 
     The jailer is playing a little joke, though. The last piece of candy looks like all the others, but it tastes awful. Determine the chair <br>
-    number occupied by the prisoner who will receive that candy.<br>
+    number occupied by the prisoner who will receive that candy.<br><br>
+
+    The first line contains an integer, , the number of test cases.
+    The next  lines each contain  space-separated integers:
+
+    n: the number of prisoners
+    m: the number of sweets
+    s: the chair number to start passing out treats at
     </p>
-    </pre><code class="java">
+    <pre><code class="java">
 static int saveThePrisoner(int n, int m, int s) {
     return (((m- 1) + (s - 1)) % n + 1);
 }
