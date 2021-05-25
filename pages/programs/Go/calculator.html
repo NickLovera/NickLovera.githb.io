@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+    <link rel="stylesheet"
+	href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/monokai-sublime.min.css">
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+    <h1>Calculator</h1>
+    <pre><code class="Go">
+        package main
+
+        import (
+            "bufio"
+            "fmt"
+            "os"
+            "strconv"
+        )
+        
+        const MENU = "------------\n1.Addition\n2.Subtraction\n3.Multiply\n4.Divide\n5.Exit\n------------"
+        
+        var (
+            firstNum int
+            secondNum int
+            answer int
+        )
+        
+        func main() {
+            scanner := bufio.NewScanner(os.Stdin)
+        
+            for {
+                fmt.Println(MENU)
+                scanned := scanner.Scan()
+                if !scanned {
+                    return
+                }
+        
+                //Get the operator
+                operator := scanner.Text()
+                if operator == "5"{
+                    os.Exit(3)
+                }
+                //Get the two values to be calulated
+                firstNum, secondNum = getNums()
+        
+                switch {
+                case operator == "1":
+                    operator = "+"
+                    answer = add(firstNum,secondNum)
+                case operator == "2":
+                    operator = "-"
+                    answer = subtract(firstNum,secondNum)
+                case operator == "3":
+                    operator = "*"
+                    answer = multiply(firstNum,secondNum)
+                case operator == "4":
+                    operator = "/"
+                    answer = divide(firstNum,secondNum)
+                default:
+                    fmt.Println("Sorry please check your input")
+                }
+        
+                //Print out the completed equation
+                fmt.Printf("\n%v %v %v = %v\n",firstNum,operator,secondNum,answer)
+                fmt.Println("------------")
+            }
+        }
+        
+        func getNums() (int,int){
+            scanner := bufio.NewScanner(os.Stdin)
+        
+            //Get The first number
+            fmt.Println("Please enter the first number:")
+            firstScanned := scanner.Scan()
+            if !firstScanned {
+                return 1,1
+            }
+            //Convert firstNumString to type(int)
+            firstNumString := scanner.Text()
+            firstNum, err := strconv.Atoi(firstNumString)
+            if err != nil{
+                fmt.Println(err)
+            }
+        
+            //Get the second number
+            fmt.Println("Please enter the second number:")
+            secScanned := scanner.Scan()
+            if !secScanned {
+                return 1,1
+            }
+            //Convert secondNumString tp type(int)
+            secondNumString := scanner.Text()
+            secondNum, err := strconv.Atoi(secondNumString)
+            if err != nil{
+                fmt.Println(err)
+            }
+        
+            return firstNum,secondNum
+        }
+        
+        // Adds two numbers together
+        func add(firstNum, secondNum int) int {
+            return firstNum + secondNum
+        }
+        
+        func subtract(firstNum, secondNum int) int{
+            return firstNum - secondNum
+        }
+        
+        func multiply(firstNum, secondNum int) int{
+            return firstNum * secondNum
+        }
+        
+        func divide(firstNum, secondNum int) int{
+            if secondNum == 0{
+                fmt.Println("Can't Divide by 0")
+                return 0
+            }
+            return firstNum / secondNum
+        }
+        
+}
+	</code></pre>        
+</html>
