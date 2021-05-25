@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+    <link rel="stylesheet"
+	href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/monokai-sublime.min.css">
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+    <h1>Chocolate Feast</h1>
+    <pre><code class="Go">
+        package main
+
+        import (
+            "bufio"
+            "fmt"
+            "math/rand"
+            "os"
+            "strconv"
+            "time"
+        )
+        
+        func main() {
+            for {
+                fmt.Println("-----New Game ------")
+                gameNums := generateNums()
+                for  {
+                    //Get user's guess
+                    userNums := getNums()
+                    //Check the guess
+                    result := getResult(gameNums, userNums)
+                    //For debugging
+                    fmt.Println(gameNums, "\n", userNums)
+                    //
+                    //Check if user won
+                    //If they did print the answer and exit the program (How can i break from this and generate new nums to play again
+                    if checkWin(result){
+                        fmt.Println("YOU WON! \nThe answer was: ", gameNums)
+                        break
+                    }
+                    //Print guess result
+                    fmt.Println("Exact: ", result[0], " Close: ", result[1])
+                }
+            }
+        }
+        
+        /*
+            @Params nil
+            @Returns int array containing the 3 random integers
+         */
+        func generateNums() []int {
+            var different int64 = 0
+            var gameNums [3]int
+            for i := 0; i < 3; i++ {
+                rand.Seed(time.Now().UnixNano() + different)
+                //Change min and max vals to user selected
+                gameNums[i] = randomInt(0, 10)
+                different += 1
+            }
+            return gameNums[0:3]
+        }
+        
+        /**
+            Generates 3 random numbers for the current round
+            @Params min: the lowest bound (Is it inclusive in Go)
+            @Params max: the highest bound (Is it inclusive in Go)
+         */
+        func randomInt(min, max int) int {
+            return min + rand.Intn(max-min)
+        }
+        
+        /**
+            Gets and checks the users input
+            @Return int array containing the users 3 number guess
+         */
+        func getNums() []int {
+            fmt.Print("Guess your three space separated numbers or e to exit: ")
+            fmt.Println()
+            //Get user input
+            scanner := bufio.NewScanner(os.Stdin)
+            scanned := scanner.Scan()
+            //Need to figure out this error
+            if !scanned {
+                fmt.Print("How would this happen")
+                os.Exit(0)
+            }
+        
+            var userNums [3]int
+            var err error
+        
+            //Get user input
+            numbers := scanner.Text()
+        
+            //Check user input
+            switch {
+            case numbers == "e": //Exit case
+                os.Exit(3)
+        
+            case len(numbers) != 5: //Bad input
+                fmt.Println("Please double check your input is 3 numbers spaced separated")
+                fmt.Println("Ex: 1 2 3")
+        
+            default: // Entered 3 numbers separated by spaces
+                //i is used for userNums index
+                //j is used for splitting the user inputted string
+                for i, j := 0, 0; i < 3; i, j = i+1, j+2 {
+                    userNums[i], err = strconv.Atoi(numbers[j : j+1])
+        
+                    if err != nil { //There was an error
+                        fmt.Println("Couldn't convert user input to int")
+                        os.Exit(0)
+                    }
+                }
+        
+            }
+            return userNums[0:3]
+        }
+        
+        func getResult(gameNums, userNums []int) [2]int {
+            var result  [2]int
+            for i := 0; i < 3; i++{
+                if gameNums[i] == userNums[i]{
+                    result[0]++
+                } else if contains(gameNums,userNums[i]){
+                    result[1]++
+                }
+            }
+            return result
+        }
+        
+        func contains(gameNums []int, userNum int) bool {
+            for _, value := range gameNums {
+                if value == userNum {
+                    return true
+                }
+            }
+            return false
+        }
+        
+        func checkWin(result [2]int) bool {
+            if result[0] == 3{
+                return true
+            }
+            return false
+        }
+        
+	</code></pre>        
+</html>
