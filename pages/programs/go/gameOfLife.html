@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+    <link rel="stylesheet"
+	href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/monokai-sublime.min.css">
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+    <h1>Strikes and Balls</h1>
+    <pre><code class="Go">
+        package main
+
+        import (
+            "bufio"
+            "fmt"
+            "log"
+            "os"
+            "time"
+        )
+        
+        func main(){
+            start := time.Now()
+            var (
+            //	step = 0
+                inputFile = "input.txt"
+            )
+        
+            lines, err := readLines(inputFile)
+        
+            if err != nil {
+                fmt.Println(err)
+            }
+            //79 = 0
+            //46 = .
+            convertLines  := [20][40]int{}
+            for i := range lines{
+                for j, cell := range lines[i] {
+                    if cell == 46 {
+                        convertLines[i][j] = 0
+                    }else {
+                        convertLines[i][j] = 1
+                    }
+                }
+        
+            }
+            //Apply 100 steps and save to file
+            cellCare(convertLines)
+            fmt.Println(time.Since(start))
+        }
+        
+        func cellCare(lines [20][40]int){
+            x := 0
+            N := len(lines)
+            M := len(lines[0])
+            nextLine := [20][40]int{}
+            for x != 100000 {
+                for i,_ := range lines{
+                    for j,cell := range lines[i]{
+                        friends := lines[i][mod((j-1),M)] + lines[i][mod((j+1),M)] +  //Need to make sure it isnt a negative value :( https://www.reddit.com/r/golang/comments/bnvik4/modulo_in_golang/
+                            lines[mod((i-1),N)][j] + lines[mod((i+1),N)][j] +
+                            lines[mod((i-1),N)][mod((j-1),M)] + lines[mod((i-1),N)][mod((j+1),M)] +
+                            lines[mod((i+1),N)][mod((j-1),M)] + lines[mod((i+1),N)][mod((j+1),M)]
+                        if cell == 1 {
+                            if friends > 1 && friends < 5{
+                                nextLine[i][j] = 1
+                            } else{
+                                nextLine[i][j] = 0
+                            }
+                        } else {
+                            if friends != 0 && friends % 2 == 0{
+                                nextLine[i][j] = 1
+                            } else{
+                                nextLine[i][j] = 0
+                            }
+                        }
+                    }
+                }
+                x++
+                lines = nextLine
+            }
+        
+            //Write to file
+            if err := writeLines(nextLine, "output.txt"); err != nil {
+                log.Fatalf("writeLines: %s", err)
+            }
+        }
+        
+        func debug(lines [20][40]int){
+            for i,_ := range lines {
+                for _, cell := range lines[i] {
+                    if cell == 0{
+                        fmt.Print(".")
+                    }else{
+                        fmt.Print("O")
+                    }
+                }
+                fmt.Println()
+            }
+            fmt.Println()
+        }
+        func mod(a, b int) int {
+            m := a % b
+            if a < 0 && b < 0 {
+                m -= b
+            }
+            if a < 0 && b > 0 {
+                m += b
+            }
+            return m
+        }
+        
+        func readLines(path string) ([]string, error) {
+            file, err := os.Open(path)
+            if err != nil {
+                return nil, err
+            }
+            defer file.Close()
+        
+            var lines []string
+            scanner := bufio.NewScanner(file)
+            for scanner.Scan() {
+                lines = append(lines, scanner.Text())
+            }
+            return lines, scanner.Err()
+        }
+        
+        // writeLines writes the lines to the given file.
+        func writeLines(lines [20][40]int, path string) error {
+            file, err := os.Create(path)
+            if err != nil {
+                return err
+            }
+            defer file.Close()
+        
+            w := bufio.NewWriter(file)
+            for i, _ := range lines{
+                for _, cell := range lines[i] {
+                    if cell == 0{
+                        fmt.Fprint(w, ".")
+                    }else {
+                        fmt.Fprint(w, "0")
+                    }
+                }
+                fmt.Fprintln(w)
+            }
+            return w.Flush()
+        }
+	</code></pre>        
+</html>
